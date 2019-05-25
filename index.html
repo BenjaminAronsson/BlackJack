@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"></html>
+<html>
+<head>
+    <meta charset="UTF-8">      
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <title>Blackjack</title>
+  <style scoped>
+      .card {
+          border: thin solid black;
+          text-align: initial;
+          font-size: 120%;
+          height: 7em;
+          width: 5em;
+          margin: 10px;
+          padding: 5px;
+          /* border-radius: 10px; */
+          background-color: white;
+          color: black
+      }
+      .card-bottom {
+          position: relative;
+          bottom: -0.8em;
+          text-align: left;
+          transform: rotate(180deg);
+      }
+      .card-mid{
+          font-size: 180%;
+          text-align: center;
+      }
+      .hand {
+          /* background-color: aqua; */
+          display: grid;
+          grid-template-areas:
+          ". . .";
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          width: 100%;
+      }
+      .plain {
+          text-align: center;
+
+      }
+      .active-player {
+          color: #4eff00;
+          font-size: 150%
+      }
+      .card-red {
+          color: #D50000
+      }
+      .card-black {
+          color: rgb(0, 0, 0)
+      }
+
+
+      #app {
+          text-align: center;
+          align-items: center;
+          color: aliceblue;
+          
+      }
+
+      input {
+          height: 3em;
+          width: 8em;
+          /* display = block" */
+          background-color: rgb(130, 0, 0);
+          color: #ffffff;
+          border-radius: 1em;
+          font-size: 1em;
+      }
+
+      
+  </style>
+</head>
+<body>
+  <div id="app">
+    <v-app class="green darken-2">
+      <!-- toolbar -->
+        <v-toolbar clipped-left dark app class="red darken-4">
+            <v-toolbar-side-icon  @click.stop="drawer = !drawer" class="hidden-md-and-up"></v-toolbar-side-icon>
+            <v-toolbar-title class="headline">
+                <span>Blackjack</span>
+                <span class="font-weight-light">the game</span>
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items class="hidden-sm-and-down">
+                <v-btn flat @click="changePlayers">
+                    <span class="mr-2">Change players</span>
+                </v-btn>
+                <v-btn flat @click="$store.commit('restartGame')" >
+                        <span class="mr-2">Restart</span>
+                    </v-btn>
+            </v-toolbar-items>
+          </v-toolbar>
+          
+            <v-navigation-drawer
+              v-model="drawer"
+              temporary
+              absolute
+              width = "200"
+              id = "drawer"
+            >
+            
+            </v-navigation-drawer>
+
+
+            
+        
+        <!-- content -->
+        <v-content>
+            <v-alert :value="$store.state.isGameEnded" type="warning">
+              {{$store.state.endMessage}}
+            </v-alert>
+          <router-view></router-view>
+        </v-content>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+  <script src="https://unpkg.com/vuex/dist/vuex.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
+
+
+
+<!-- 
+<v-menu
+      transition="slide-x-transition"
+      bottom
+      right
+    >
+      <template v-slot:activator="{ on }">
+        <v-btn
+          class="deep-orange"
+          color="primary"
+          dark
+          v-on="on"
+        >
+          Slide X Transition
+        </v-btn>
+      </template>
+
+      <v-list>
+        <v-list-tile
+          v-for="(item, i) in items"
+          :key="i"
+          @click=""
+        >
+          <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-menu>
+
+     -->
