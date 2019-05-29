@@ -1,3 +1,5 @@
+/*jshint esversion: 8 */
+
 Vue.component("popup", {
   template: `
   <v-dialog max-width="500px">
@@ -63,19 +65,19 @@ Vue.component("card", {
     
       switch (value) {
         case 1:
-          value = "A"
+          value = "A";
         break;
         case 10:
-          value = "10"
+          value = "10";
           break;
         case 11:
-          value = "J"
+          value = "J";
           break;
         case 12:
-          value = "Q"
+          value = "Q";
           break;
         case 13:
-          value = "K"
+          value = "K";
           break;
         default:
       }
@@ -102,10 +104,19 @@ computed: {
 },
 //TODO: call this on restart
 created() {
+
+  //create deck
   this.deck = this.createDeck()
   this.shuffle(this.deck)
-  this.drawCard()
-  this.nextPlayer()
+  
+  //gives every player 2 cards
+  for (let i = 0; i < this.players.length; i++) {
+    //dealer only gets 1 card
+    i !== 0 ? this.drawCard() : null;
+    this.drawCard();
+    this.nextPlayer();
+  }
+  this.nextPlayer(); 
 },
 data() {
   return {
@@ -122,20 +133,24 @@ props: {
               {value: 1, suit: "SPADES"}, {value: 1, suit: "SPADES"}
             ]
           }
-        ]
-      return ps
+        ];
+      return ps;
     }
   }
 },
 methods:{
   
   drawCard() { 
-    let p = this.players[this.currentPlayer]
-    p.hand.push(this.deck[this.deck.length-1])
-    this.deck.pop()
+    let p = this.players[this.currentPlayer];
+    p.hand.push(this.deck[this.deck.length-1]);
+    this.deck.pop();
 
     //update player score
-    p.score = this.score(p.hand)
+    p.score = this.score(p.hand);
+    if (p.score > 21) {
+        this.displayMessage() 
+        store.commit('endGame')
+    }
   },
 
   nextPlayer() {
@@ -146,9 +161,34 @@ methods:{
     }
   },
 
+  leadingPlayer() {
+    let winningPlayer = null
+    console.log("test winner");
+    
+    this.players.forEach(player => {
+      //if score is under 21
+      if(player.score <= 21) {
+        //set first player to winner
+        if(winningPlayer === null) {
+          console.log("first winner: " +player.name +" score:" + player.score);
+          winningPlayer = player
+        }
+        //update winner if player score is higher than last winner
+        else if( player.score > winningPlayer.score) {
+          winningPlayer = player
+          console.log("new winner: " +player.name); 
+        }
+      }
+    })
+    //returns winner
+    return winningPlayer
+  },
+
   dealersTurn() {
     let dealer = this.players[this.currentPlayer]
     let draw = this.drawCard
+    let leading = this.leadingPlayer
+    let ds = this.displayMessage
 
     async function delay(delayInms) {
       return new Promise(resolve  => {
@@ -164,9 +204,30 @@ methods:{
         draw()
       } 
       store.commit('endGame')
-      this.created()
+      //this.created()
+
+      //
+      //let dealer = this.players[this.currentPlayer]
+      //find winner
+      
+      let winner = leading()
+      ds(winner)
     }
     fillhand() 
+  },
+
+  displayMessage(winner) {
+    //display message
+    
+    let message = 'Game ended!'
+    if (!winner){
+      message = 'Busted'
+    } else if(winner === this.players[0]) {
+      message = 'You lose!'
+    } else {
+      message = 'You won!'
+    }
+    store.commit('setEndMessage', message)
   },
 
   hold() { 
@@ -174,35 +235,10 @@ methods:{
 
     //if dealer
     if(this.currentPlayer === 0) {
-      //dealer turn
-      let dealer = this.players[this.currentPlayer]
+      
+      //dealer take cards
       this.dealersTurn()
-      let winner = this.leadingPlayer()
-
-      let message = 'Game ended'
-      if(winner === dealer) {
-        message = 'You lose!'
-      } else {
-        message = 'You won!'
-      }
-      store.commit('setEndMessage', message)
     }
-  },
-
-  leadingPlayer() {
-    let winningPlayer = null
-
-    this.players.forEach(player => {
-      if(player.score <= 21) {
-        if(winningPlayer === null) {
-          winningPlayer = player
-        }
-        else if( winningPlayer.score < player.score) {
-          winningPlayer = player
-        }
-      }
-    })
-    return winningPlayer
   },
 
   shuffle(cards) {
@@ -229,7 +265,7 @@ methods:{
           score += value
         }
       }
-      for (var i = 0; i < numberOfAces; i++) {
+      for (let i = 0; i < numberOfAces; i++) {
         if (score > 21) {
           score -= 10
         }
